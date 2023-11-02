@@ -1,39 +1,57 @@
-def add(value1, value2):
-    return value1 + value2
+''' RPN Calculator '''
+
+class Calculator:
+    def __init__ (self):
+        self.stack = []
+
+    def push(self, value):
+        self.stack.append(value) 
 
 
-def subtract(value1, value2):
-    return value1 - value2
+    def pop(self):
+        return self.stack.pop()  
 
 
-def divide(value1, value2):
-    return value1 / value2
+    def add(self):
+        return self.pop() + self.pop()
 
 
-def multiply(value1, value2):
-    return value1 * value2
+    def subtract(self):
+        return self.pop() - self.pop()
 
 
-def calculate(operator, value1, value2):
-    if operator == "+":
-        print(add(value1, value2))
-    elif operator == "-":
-        print(subtract(value1, value2))
-    elif operator == "/":
-        print(divide(value1, value2))
-    elif operator == "*":
-        print(multiply(value1, value2))
-    else:
-        return False
+    def divide(self):
+        denominator = self.pop()
+        return self.pop() / denominator
 
-    return True
 
+    def multiply(self):
+        return self.pop() * self.pop()
+
+
+    def calculate(self, operator):
+        if operator == "+":
+            return self.add()
+        elif operator == "-":
+            return self.subtract()
+        elif operator == "/":
+            return self.divide()
+        elif operator == "*":
+            return self.multiply()
+
+calculator = Calculator() #object
 
 while True:
-    value1 = int(input("Digito 1 "))
-    value2 = int(input("Digite 2 "))
+    val_oper = input("Digit or + - / * ")
 
-    operator = input("+, -, / ou *? ")
+    if val_oper.isnumeric():
+        calculator.push(int(val_oper))
 
-    if not calculate(operator, value1, value2):
-        break
+    else:
+        calculator.push(calculator.calculate(val_oper))
+
+        """
+        if not calculate(val_oper):
+            break"""
+
+    print(calculator.stack)
