@@ -1,37 +1,35 @@
-''' RPN Calculator '''
+from flask import Flask, request, jsonify
 import math
 
+app = Flask(__name__)
+
 class Operation:
-    def __init__ (self, operator):
+    def __init__(self, operator):
         self.operator = operator
 
-    def operate (self, stack):
-        pass
-
-
 class Addition(Operation):
-    def operate (self, stack):
+    def operate(self, stack):
         return stack.pop() + stack.pop()
 
 class Subtract(Operation):
-    def operate (self, stack):
+    def operate(self, stack):
         return stack.pop() - stack.pop()
 
 class Divide(Operation):
-    def operate (self, stack):
+    def operate(self, stack):
         denominator = stack.pop()
         return stack.pop() / denominator
 
 class Multiply(Operation):
-    def operate (self, stack):
+    def operate(self, stack):
         return stack.pop() * stack.pop()
 
 class SquareRoot(Operation):
-    def operate (self, stack):
+    def operate(self, stack):
         return math.sqrt(stack.pop())
 
 class Stack:
-    def __init__ (self):
+    def __init__(self):
         self.stack = []
         self.operations = [
             Addition("+"),
@@ -42,32 +40,55 @@ class Stack:
         ]
 
     def push(self, value):
-        self.stack.append(value) 
-
+        self.stack.append(value)
 
     def pop(self):
-        return self.stack.pop()  
-
+        return self.stack.pop()
 
     def calculate(self, operator):
         for op in self.operations:
             if op.operator == operator:
                 return op.operate(self.stack)
 
+stack = Stack()
 
-stack = Stack() #object
 
-while True:
-    val_oper = input("> ")
+@app.route("/")
+def welcome():
+    return "<p>Welcome to RPN Calculator!</p>"
 
-    if val_oper.isnumeric():
-        stack.push(int(val_oper))
+@app.route("/calculate", methods=["POST"])
+def calculate():
+    operator = request.form['input']
 
+    if operator in [op.operator for op in stack.operations]:
+        stack.push(stack.calculate(operator))
     else:
-        stack.push(stack.calculate(val_oper))
+        return "error: Invalid operation. Please try again."
 
-        """
-        if not calculate(val_oper):
-            break"""
+    return {
+        "stack": stack.stack
+    }
 
-    print(stack.stack)
+@app.route("/number", methods=["POST"])
+def number():
+    value = request.form['value']
+
+    if value.isnumeric():
+        stack.push(int(value))
+    else:
+        return "error: Invalid operation. Please try again."
+
+    return {
+        "stack": stack.stack
+    }
+
+@app.route("/stack")
+def get_stack():
+    return {
+        "stack": stack.stack
+    }
+
+
+if __name__ == "__main__":
+    app.run(port=8000, debug=True)
