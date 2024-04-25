@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import math
 
 app = Flask(__name__)
@@ -13,7 +13,9 @@ class Addition(Operation):
 
 class Subtract(Operation):
     def operate(self, stack):
-        return stack.pop() - stack.pop()
+        second_operand = stack.pop()
+        first_operand = stack.pop()
+        return first_operand - second_operand
 
 class Divide(Operation):
     def operate(self, stack):
@@ -88,6 +90,16 @@ def get_stack():
     return {
         "stack": stack.stack
     }
+
+@app.route("/reset", methods=["POST"])
+def reset():
+    stack.stack = [] 
+    return {
+        "status": "stack reset"
+    }, 200
+
+def tearDown(self):
+    self.client.get('/reset')
 
 
 if __name__ == "__main__":
