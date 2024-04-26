@@ -69,38 +69,35 @@ stack = Stack()
 @app.route("/")
 def welcome():
     """Welcome message."""
-    return "<p>Welcome to RPN Calculator!</p>"
+    return "<p>Welcome to RPN Calculator!</p>", 200
 
 @app.route("/calculate", methods=["POST"])
 def calculate():
     """Perform calculation."""
-    operator = request.form['input']
-    if operator in [op.operator for op in stack.operations]:
-        stack.push(stack.calculate(operator))
-    else:
-        return "error: Invalid operation. Please try again."
-    return {
-        "stack": stack.stack
-    }
+    operator = request.form.get('input')
+    try:
+        result = stack.calculate(operator)
+        stack.push(result)
+        return {"stack": stack.stack}
+    except (ValueError, IndexError) as e:
+        return {"error": str(e)}, 400
 
 @app.route("/number", methods=["POST"])
 def number():
     """Push number onto the stack."""
-    value = request.form['value']
-    if value.isnumeric():
-        stack.push(int(value))
-    else:
-        return "error: Invalid operation. Please try again."
-    return {
-        "stack": stack.stack
-    }
+    value = request.form.get('value')
+    try:
+        stack.push(float(value))
+        return {"stack": stack.stack}
+    except ValueError:
+        return {"error": "Invalid number"}, 400
 
 @app.route("/stack")
 def get_stack():
     """Get current stack."""
     return {
         "stack": stack.stack
-    }
+    }, 200
 
 @app.route("/reset", methods=["POST"])
 def reset():
