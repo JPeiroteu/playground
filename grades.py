@@ -1,61 +1,56 @@
+"""
+Module to manage student grades and assignments.
+"""
+
 class Student:
+    """Class representing a student."""
     def __init__(self, name):
         self.name = name
         self.assignments = []
 
     def add_grade(self, grade, weight):
+        """Add a grade for an assignment."""
         self.assignments.append(Work(grade, weight))
 
     def final_grade(self):
-        final_grade = 0
-
-        for assignment in self.assignments:
-            assignment_grade = assignment.grade * assignment.weight
-            final_grade += assignment_grade
-
-        return final_grade
+        """Calculate the final grade for the student."""
+        return sum(assignment.grade * assignment.weight for assignment in self.assignments)
 
 class Work:
+    """Class representing a student's assignment."""
     def __init__(self, grade, weight):
         self.grade = grade
         self.weight = weight
 
 def main():
-    students = []
+    """Main function to interact with the user."""
+    students = {}
 
     while True:
-        stud_work = input("Insert student name, work, or class media: ")
+        stud_work = input("Insert student name, work, or class media: ").lower()
 
         if stud_work == "student name":
             name = input("Student Name: ")
-            students.append(Student(name))
+            students[name] = Student(name)
 
         elif stud_work == "work":
             student_name = input("Enter Student Name: ")
 
-            found = False
-            for student in students:
-                if student.name == student_name:
-                    grade = float(input("Student Grade: "))
-                    weight = float(input("Work Weight: "))
+            if student_name in students:
+                grade = float(input("Student Grade: "))
+                weight = float(input("Work Weight: "))
 
-                    student.add_grade(grade, weight)
-                    print(student.assignments)
-                    print(student.final_grade())
-                    found = True
-        
-            if not found:
+                students[student_name].add_grade(grade, weight)
+                print(students[student_name].assignments)
+                print(students[student_name].final_grade())
+            else:
                 print("Student not found.")
-        
+
         else:
-            students_media = 0
-            n_media = 0 
+            students_media = sum(student.final_grade() for student in students.values())
+            n_students = len(students)
 
-            for student in students:
-                students_media += student.final_grade()
-                n_media += 1
-
-            print(students_media / n_media)
+            print(students_media / n_students)
 
 if __name__ == "__main__":
     main()
